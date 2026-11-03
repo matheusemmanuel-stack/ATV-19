@@ -24,10 +24,7 @@ def categoria_create_view(request):
     if request.method == "POST":
         form = forms.CategoriaForm(request.POST)
         if form.is_valid():
-            nome = form.cleaned_data["nome"]
-            models.Categoria.objects.create(
-                nome=nome
-            )
+            form.save()
             messages.success(request, "Categoria criada com sucesso!")
             return redirect("noticias:categorias")
         else:
@@ -43,16 +40,15 @@ def categoria_update_view(request, categoria_id):
     categoria = models.Categoria.objects.get(id=categoria_id)
 
     if request.method == "POST":
-        form = forms.CategoriaForm(request.POST)
+        form = forms.CategoriaForm(request.POST, instance=categoria)
         if form.is_valid():
-            categoria.nome = form.cleaned_data["nome"]
-            categoria.save()
+            form.save()
             messages.success(request, "Categoria atualizada com sucesso!")
             return redirect("noticias:categorias")
         else:
             messages.error(request, "Erro ao atualizar categoria. Verifique os dados informados.")
     else:
-        form = forms.CategoriaForm(initial={"nome": categoria.nome})
+        form = forms.CategoriaForm(instance=categoria)
 
     return render(request, "categoria/form.html", {
         "form": form,
@@ -108,11 +104,10 @@ def tag_update_view(request, tag_id):
     tag = models.Tag.objects.get(id=tag_id)
 
     if request.method == "POST":
-        form = forms.TagForm(request.POST)
+        form = forms.TagForm(request.POST, instance=tag)
         if form.is_valid():
+            form.save()
             messages.success(request, "Tag atualizada com sucesso!")
-            tag.nome = form.cleaned_data["nome"]
-            tag.save()
             return redirect("noticias:tags")
         else:
             messages.error(request, "Erro ao atualizar tag. Verifique os dados informados.")
@@ -147,22 +142,13 @@ def noticia_update_view(request, noticia_id):
     noticia = models.Noticia.objects.get(id=noticia_id)
 
     if request.method == "POST":
-        form = forms.NoticiaForm(request.POST)
+        form = forms.NoticiaForm(request.POST, instance=noticia)
         if form.is_valid():
-            noticia.titulo = form.cleaned_data["titulo"]
-            noticia.texto = form.cleaned_data["texto"]
-            noticia.categoria = form.cleaned_data["categoria"]
-            noticia.tags.set(form.cleaned_data["tags"])
-            noticia.save()
+            form.save()
             messages.success(request, "Notícia atualizada com sucesso!")
             return redirect("noticias:noticias")
     else:
-        form = forms.NoticiaForm(initial={
-            "titulo": noticia.titulo,
-            "texto": noticia.texto,
-            "categoria": noticia.categoria,
-            "tags": noticia.tags.all(),
-        })
+        form = forms.NoticiaForm(instance=noticia)
 
     return render(request, "noticia/form.html", {
         "form": form,

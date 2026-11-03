@@ -24,8 +24,10 @@
 
 <div>
     <a href="{% url 'noticias:noticia_update' noticia.id %}" class="btn-back btn-edit">Editar noticia</a>
-    <a href="{% url 'noticias:noticia_delete' noticia.id %}" class="btn-back btn-exclude">Deletar noticia</a>
+    <button type="button" class="btn-back btn-exclude" data-bs-toggle="modal" data-bs-target="#modalExcluir">Deletar noticia</button>
 </div>
+
+{% include 'noticia/confirmar_exclusao.html' %}
 
 <a href="{% url 'noticias:noticias' %}" class="btn-back">&larr; Voltar para as notícias</a>
 {% endblock %}
