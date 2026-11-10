@@ -25,7 +25,7 @@ def categoria_create_view(request):
         form = forms.CategoriaForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Categoria criada com sucesso!")
+            messages.success(request, "Categoria cadastrada com sucesso!")
             return redirect("noticias:categorias")
         else:
             messages.error(request, "Erro ao criar categoria. Verifique os dados informados.")
@@ -60,10 +60,10 @@ def categoria_delete_view(request, categoria_id):
     if request.method == "POST":
         try:
             categoria.delete()
-            messages.success(request, "Categoria deletada com sucesso!")
+            messages.success(request, "Categoria excluída com sucesso!")
             return redirect("noticias:categorias")
         except ProtectedError:
-            messages.warning(request, f"{categoria.nome} não pode ser deletada, pois existem notícias associadas a ela.")
+            messages.error(request, f"{categoria.nome} Não é possível excluir esta categoria, pois existem notícias vinculadas a ela.")
             return redirect("noticias:categorias")
     
     return render(request, "categoria/confirmar_exclusao.html", {
@@ -89,7 +89,7 @@ def tag_create_view(request):
         form = forms.TagForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Tag criada com sucesso!")
+            messages.success(request, "Tag cadastrada com sucesso!")
             return redirect("noticias:tags")
         else:
             messages.error(request, "Erro ao criar tag. Verifique os dados informados.")
@@ -120,9 +120,16 @@ def tag_update_view(request, tag_id):
     })
 
 def tag_delete_view(request, tag_id):
-    tag = models.Tag.objects.get(id=tag_id)
-    tag.delete()
-    return redirect("noticias:tags")
+    tag = get_object_or_404(models.Tag, id=tag_id)
+
+    if request.method == "POST":
+        tag.delete()
+        messages.success(request, "Tag excluída com sucesso!")
+        return redirect("noticias:tags")
+
+    return render(request, "tag/confirmar_exclusao.html", {
+        "tag": tag,
+    })
 
 def noticia_create_view(request):
     if request.method == "POST":
